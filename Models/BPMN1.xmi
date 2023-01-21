@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bPMN2RDP:Process
+    xmi:version="2.0"
+    xmlns:xmi="http://www.omg.org/XMI"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:bPMN2RDP="http://www.example.org/bPMN"
+    xsi:schemaLocation="http://www.example.org/bPMN ../MetaModels/BPMN.ecore">
+  <flowobject
+      xsi:type="bPMN2RDP:Event"
+      name="start"
+      outgoingLink="//@link.0"/>
+  <flowobject
+      xsi:type="bPMN2RDP:Task"
+      name="task1"
+      outgoingLink="//@link.1"
+      ingoingLink="//@link.0"/>
+  <flowobject
+      xsi:type="bPMN2RDP:Task"
+      name="task2"/>
+  <flowobject
+      xsi:type="bPMN2RDP:Event"
+      name="end 1"
+      ingoingLink="//@link.2"
+      type="end"/>
+  <flowobject
+      xsi:type="bPMN2RDP:ForkGateway"
+      outgoingLink="//@link.2 //@link.3"
+      ingoingLink="//@link.1"/>
+  <flowobject
+      xsi:type="bPMN2RDP:Event"
+      name="end 2"
+      ingoingLink="//@link.3"
+      type="end"/>
+  <link name="link1"
+      source="//@flowobject.0"
+      target="//@flowobject.1"/>
+  <link name="link2"
+      source="//@flowobject.1"
+      target="//@flowobject.4"/>
+  <link name="link3"
+      source="//@flowobject.4"
+      target="//@flowobject.3"/>
+  <link name="link4"
+      source="//@flowobject.4"
+      target="//@flowobject.5"/>
+</bPMN2RDP:Process>

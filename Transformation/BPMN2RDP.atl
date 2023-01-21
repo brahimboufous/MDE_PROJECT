@@ -1,0 +1,152 @@
+-- @path bPMN=/BPMN2RDP/MetaModels/BPMN.ecore
+-- @path RDP=/BPMN2RDP/MetaModels/RDP.ecore
+
+module BPMN2RDP;
+
+create OUT : RDP from IN : bPMN;
+
+
+rule BPMNProcess2PetriNet {
+    from
+        p : bPMN!Process
+    to
+        n : RDP!PetriNet(name <- p.name,node <- p.flowobject ,arc <- p.link )
+}
+
+
+--
+
+rule FlowObjectToNode {
+    from
+        p : bPMN!FlowObject
+    to
+        n : RDP!Node(name <- p.name)
+}
+
+
+rule TaskToTransition extends FlowObjectToNode {
+    from
+        p : bPMN!Task
+    to
+        n : RDP!Transition(name <- p.name)
+}
+
+
+rule StartEventToTransitionPlace extends FlowObjectToNode {
+    from
+        t : bPMN!Event(t.type = #start)
+    to
+        tr :RDP!Transition(name <- t.name),
+        l:   RDP!OutputArc(sourceTransition <- tr,targetPlace <- p),
+        p:   RDP!Place(name <- 'output')            
+}
+
+
+rule IntermediateEventToTransitionPlace extends FlowObjectToNode {
+    from
+        t : bPMN!Event(t.type = #intermediate)
+    to
+        tr :RDP!Transition(name <- t.name)          
+}
+
+
+rule EndEventToPlaceTransition extends FlowObjectToNode {
+    from
+        e : bPMN!Event(e.type = #end)
+    to
+        tr :RDP!Transition(name <- e.name),
+        l:   RDP!InputArc(sourcePlace <- p,targetTransition <- tr),
+        p:   RDP!Place(name <- 'output')
+}
+
+
+rule LinkToInputArc {
+    from
+        l : bPMN!Link(l.default = true)
+    to
+        i : RDP!InputArc(sourcePlace <- p, targetTransition <- t, weight <- 1),
+        p : RDP!Place(name <- 'input'),
+        t : RDP!Transition(name <- l.target.name)
+}
+
+rule LinkToOutputArc {
+    from
+        l : bPMN!Link(l.default = false)
+    to
+        o : RDP!OutputArc(sourceTransition <- t, targetPlace <- p, weight <- 1),
+        p : RDP!Place(name <- 'output'),
+        t : RDP!Transition(name <- l.source.name)
+}
+
+
+
+
+rule ForkParallelGateway2Place {
+   from 
+      f:bPMN!ForkGateway(f.type=#parallel)
+   to
+      n:RDP!Place(name <- f.name),
+	  p1:RDP!Place(name <- 'output1' ),
+	  p2:RDP!Place(name <- 'output2' ),
+	  t:RDP!Transition(name <- 't' ),
+	  a1:RDP!InputArc(sourcePlace <- n,targetTransition <- t),
+	  a2:RDP!OutputArc(sourceTransition <- t,targetPlace <- p1 ),
+	  a3:RDP!OutputArc(sourceTransition <- t,targetPlace <- p2 )
+	  	  
+}
+
+
+rule JoinParallelGateway2Place {
+   from 
+      f:bPMN!JoinGateway(f.type=#parallel)
+   to
+      p1:RDP!Place(name <- 'input1' ),
+	  p2:RDP!Place(name <- 'input2' ),
+	  p3:RDP!Place(name <- f.name),
+	  
+	  t:RDP!Transition(name <- 't' ),
+	  a1:RDP!OutputArc(sourceTransition <- t,targetPlace <- p3 ),
+	  a2:RDP!InputArc(sourcePlace <- p1,targetTransition <- t ),
+	  a3:RDP!InputArc(sourcePlace <- p2,targetTransition <- t )
+	  	  
+}
+
+
+rule ForkExclusiveGateway2Place {
+   from 
+      f:bPMN!ForkGateway(f.type=#exclusive)
+   to
+      p:RDP!Place(name <- f.name),
+      p1:RDP!Place(name <- 'output1' ),
+	  p2:RDP!Place(name <- 'output2' ),
+	 
+	  
+	  t1:RDP!Transition(name <- 't1' ),
+	  t2:RDP!Transition(name <- 't2' ),
+	  a11:RDP!OutputArc(sourceTransition <- t1,targetPlace <- p1 ),
+	  a12:RDP!InputArc(sourcePlace <- p,targetTransition <- t1 ),
+	  a21:RDP!OutputArc(sourceTransition <- t2,targetPlace <- p2 ),
+	  a22:RDP!InputArc(sourcePlace <- p,targetTransition <- t2 )
+	  	  
+}
+
+
+rule JoinExclusiveGateway2Place {
+   from 
+      f:bPMN!JoinGateway(f.type=#exclusive)
+   to
+      p1:RDP!Place(name <- 'input1' ),
+	  p2:RDP!Place(name <- 'input2' ),
+	  p:RDP!Place(name <- f.name),
+	  
+	  t1:RDP!Transition(name <- 't1' ),
+	  t2:RDP!Transition(name <- 't2' ),
+	  a11:RDP!OutputArc(sourceTransition <- t1,targetPlace <- p ),
+	  a12:RDP!InputArc(sourcePlace <- p1,targetTransition <- t1 ),
+	  a21:RDP!OutputArc(sourceTransition <- t2,targetPlace <- p ),
+	  a22:RDP!InputArc(sourcePlace <- p2,targetTransition <- t2 )
+	  	  
+}
+
+
+
