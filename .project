@@ -6,7 +6,8 @@
 	</projects>
 	<buildSpec>
 		<buildCommand>
-			<name>org.eclipse.m2m.atl.adt.builder.atlBuilder</name>
+			<name>org.eclipse.m2m.atl.adt.builder.atlBuilder
+			</name>
 			<arguments>
 			</arguments>
 		</buildCommand>
